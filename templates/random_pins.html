@@ -1,0 +1,251 @@
+<html>
+    <header>
+
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+            
+            /* Fondo con degradado */
+            body {
+                background: linear-gradient(to bottom, #000000, #4b0082);
+                background-attachment: fixed;
+            }
+
+            /* Contenedor de estrellas */
+            #stars-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            /* Estilo para el título fijo */
+            .fixed-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                padding: 15px 0;
+                border-radius: 0 0 25px 25px;
+                z-index: 1000;
+                color: white; /* Texto blanco */
+                font-size: 1.5em; /* Ajuste del tamaño del texto */
+                mix-blend-mode: soft-light; /* Mezcla el texto con el fondo */
+                backdrop-filter: blur(3px); /* Desenfoque para el fondo */
+            }
+
+            .fixed-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to bottom, rgba(94, 74, 209, 100%) , transparent 100%), linear-gradient(to bottom, rgba(94, 74, 209, 100%) , transparent 100%), linear-gradient(to bottom, rgba(94, 74, 209, 100%) , transparent 100%), linear-gradient(to bottom, rgba(94, 74, 209, 100%) , transparent 100%);
+                z-index: -1; /* Asegura que esté detrás del texto */
+            }
+
+            /* Asegurando el espaciado debajo del título fijo */
+            .main-container {
+                width: 70%;
+                margin: 100px auto 0;
+                padding-top: 60px;
+                box-sizing: border-box;
+            }
+
+        /* Estilo para las imágenes en cuadrícula */
+            .grid-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 3 columnas */
+                gap: 10px; /* Espacio entre las imágenes */
+            }
+
+            .image-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+                gap: 10px; /* Espacio entre las imágenes */
+            }
+
+            .image-grid div {
+                display: block;
+                /* gap: 5px; */
+            }
+
+            .image-grid img {
+                width: 100%;
+                height: 400px; /* Ajustar altura fija */
+                object-fit: cover; /* Recortar la imagen para ajustarse al contenedor */
+                border: 5px solid #7a618b; /* Borde de 15px */
+                border-radius: 10px; /* Bordes redondeados */
+                display: block; /* Asegura que las imágenes se comporten como bloques */
+            }
+
+            .button-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .button {
+                background-color: #2a3b61;
+                color: rgb(134, 231, 231);
+                padding: 10px 20px;
+                border-radius: 25px;
+                text-decoration: none;
+                text-align: center;
+                width: 100%;
+                border: none;
+                cursor: pointer;
+                display: inline-block;
+                box-sizing: border-box;
+            }
+
+            .button:hover {
+                background-color: #334a7a;
+            }
+
+            /* Estilo para el título */
+            .rounded-title {
+                display: inline-block; /* Para que el tamaño del borde se ajuste al contenido */
+                width: 100%; /* Hace que el fondo ocupe toda la pantalla */
+                padding: 10px 20px; /* Espaciado interno */
+                background-color: #5e4ad1; /* Fondo detrás del título */
+                color: white; /* Color del texto */
+                border-radius: 25px; /* Bordes redondeados */
+                text-align: center; /* Alinear el texto en el centro */
+                border: 2px solid #555; /* Borde alrededor del fondo */
+                cursor: pointer; /* Cambia el cursor al pasar por encima */
+            }
+
+            /* Centrando el contenedor del título */
+            .title-container {
+                text-align: center; /* Centrar el título */
+                margin-top: 50px; /* Margen superior para espaciar el título */
+                border-radius: 10px; /* Bordes redondeados del contenedor */
+            }
+
+            /* Estilos modificados para el div colapsable */
+            .collapsible-toggle {
+                display: none;
+            }
+
+            .collapsible-label {
+                display: inline-block;
+                width: 100%;
+                padding: 10px 20px;
+                background-color: #5e4ad1;
+                color: white;
+                border-radius: 25px;
+                text-align: center;
+                border: 2px solid #555;
+                cursor: pointer;
+                margin-bottom: 10px;
+                /* box-sizing: border-box; */
+            }
+
+            .collapsible-content {
+                background-color: #49475e;
+                max-height: 0;
+                overflow: hidden;
+                border-radius: 10px; /* Bordes redondeados del contenedor */
+                border: 2px solid #5f4979;
+                transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+            }
+
+            .collapsible-toggle:checked + .collapsible-label + .collapsible-content {
+                max-height: 9999px;
+                transition: max-height 1s ease-in-out;
+            }
+
+            .collapsible-label::after {
+                content: '▼';
+                float: right;
+                transform: rotate(0deg);
+                transition: transform 0.3s ease-out;
+            }
+
+            .collapsible-toggle:checked + .collapsible-label::after {
+                transform: rotate(180deg);
+            }
+        </style>
+    </header>
+    <body>
+        <div id="stars-container"></div>
+        <header class="fixed-header"><h1>GatitoDepresivo's random references</h1></header>
+        <div class="main-container">
+            {% for name, selection in shake.items() %}
+                <div class="title-container">
+                    <input type="checkbox" id="{{name}}-toggle" class="collapsible-toggle" checked>
+                    <label for="{{name}}-toggle" class="collapsible-label">{{name}}</label>
+            
+                    <div class="collapsible">
+                        <div class="image-grid">
+                            {% for pin in pins %}
+                                <div class="image-grid">
+                                    <div class="button-container">
+                                        <img src="{{ pin['images']['orig']['url'] }}">
+                                        <a href="https://pinterest.com/pin/{{ pin['id'] }}" target="_blank">
+                                            <button class="button" rel="noopener noreferrer">Source</button>
+                                        </a>
+                                        <a href="{{ pin['images']['orig']['url'] }}" target="_blank">
+                                            <button class="button" rel="noopener noreferrer">Full</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </body>
+    <script>
+        function createStar() {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = '2px';
+            star.style.height = '2px';
+            star.style.backgroundColor = 'yellow';
+            star.style.borderRadius = '50%';
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.dataset.speed = Math.random() * 0.10 + 0.01; // Store speed as a dataset attribute
+            return star;
+        }
+    
+        function initStars() {
+            const container = document.getElementById('stars-container');
+            for (let i = 0; i < 100; i++) {
+                container.appendChild(createStar());
+            }
+            moveStars(); // Initial position update
+        }
+    
+        function moveStars() {
+            const stars = document.querySelectorAll('#stars-container div');
+            const scrollY = window.scrollY;
+            
+            stars.forEach(star => {
+                const speed = parseFloat(star.dataset.speed);
+                star.style.transform = `translateY(${scrollY * speed}px)`;
+            });
+            
+            requestAnimationFrame(moveStars); // Request next frame for smooth animation
+        }
+    
+        window.addEventListener('load', initStars);
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(moveStars); // Trigger the movement only on scroll
+        });
+    </script>
+</html>
