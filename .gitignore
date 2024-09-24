@@ -1,6 +1,8 @@
 .env
+test_pinterest.py
+DailyDrawScript.py
+ReferenceShuffle.spec
 /venv
 /__pycache__
 /data
 /dist
-ReferenceShuffle.spec
