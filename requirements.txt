@@ -1,0 +1,5 @@
+beautifulsoup4==4.12.3
+Flask==3.0.3
+requests==2.32.3
+py3-pinterest==1.4.0
+gunicorn==23.0.0

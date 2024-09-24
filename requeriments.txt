@@ -1,5 +1,0 @@
-bs4
-flask
-dotenv
-requests
-py3pin-pinterest
