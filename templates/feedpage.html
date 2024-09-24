@@ -1,0 +1,104 @@
+<html>
+    <header>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Random reference feed</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/feed.css') }}">
+        <style>
+            .image-grid {
+                display: grid;
+                grid-template-columns: repeat( {{3 if amount_pins%3 ==0 else 2 if amount_pins % 2 == 0 else 1}} , 1fr); /* 3 columnas */
+                gap: 10px; /* Espacio entre las imágenes */
+            }
+
+            .image-grid div {
+                display: block;
+                /* gap: 5px; */
+            }
+
+            .image-grid img {
+                width: 100%;
+                height: {{400 if amount_pins % 3 == 0 else 600 if amount_pins % 2 == 0 else '100%'}}px; /* Ajustar altura fija */
+                object-fit: cover; /* Recortar la imagen para ajustarse al contenedor */
+                border: 5px solid #7a618b; /* Borde de 15px */
+                border-radius: 10px; /* Bordes redondeados */
+                display: block; /* Asegura que las imágenes se comporten como bloques */
+            }
+
+        </style>
+    </header>
+    <body>
+        <div id="stars-container"></div>
+        <header class="fixed-header"><h1>{{title}} random references</h1></header>
+        <div class="main-container">
+            {% for name, selection in shake.items() %}
+                <div class="title-container">
+                    <input type="checkbox" id="{{name}}-toggle" class="collapsible-toggle" checked>
+                    <label for="{{name}}-toggle" class="collapsible-label">{{name}}</label>
+                    <div class="collapsible-content">
+                        <div class="image-grid">
+                            {% for pin in selection %}
+                                <div class="button-container">
+                                    <img src="{{ pin['images']['orig']['url'] }}">
+                                    <a href="https://pinterest.com/pin/{{ pin['id'] }}" target="_blank">
+                                        <button class="button" rel="noopener noreferrer">Source</button>
+                                    </a>
+                                    <a href="{{ pin['images']['orig']['url'] }}" target="_blank">
+                                        <button class="button" rel="noopener noreferrer">Full</button>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </body>
+    <script>
+        function createStar() {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = '2px';
+            star.style.height = '2px';
+            star.style.backgroundColor = 'yellow';
+            star.style.borderRadius = '50%';
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.dataset.speed = Math.random() * 0.10 + 0.01; // Store speed as a dataset attribute
+            return star;
+        }
+    
+        function initStars() {
+    const container = document.getElementById('stars-container');
+    for (let i = 0; i < 100; i++) {
+        container.appendChild(createStar());
+    }
+    moveStars(); // Initial position update
+        }
+
+        function moveStars() {
+            const stars = document.querySelectorAll('#stars-container div');
+            const scrollY = window.scrollY;
+            
+            stars.forEach(star => {
+                const speed = parseFloat(star.dataset.speed);
+                const starY = scrollY * speed;
+
+                // Mover estrella
+                star.style.transform = `translateY(${starY}px)`;
+
+                // Si la estrella sale del viewport, la reciclamos
+                if (starY > window.innerHeight) {
+                    star.style.transform = `translateY(-${window.innerHeight}px)`; // La volvemos a subir arriba
+                }
+            });
+
+            requestAnimationFrame(moveStars); // Request next frame for smooth animation
+        }
+
+        window.addEventListener('load', initStars);
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(moveStars); // Trigger the movement only on scroll
+        });
+    </script>
+</html>

@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from py3pin.Pinterest import Pinterest
 from dotenv import dotenv_values
 from typing import Any, Union
-from random import choice
+from random import choice, sample
 import os
 
 
@@ -50,7 +50,7 @@ style = '''
         z-index: 1000;
         color: white; /* Texto blanco */
         font-size: 1.5em; /* Ajuste del tamaño del texto */
-        mix-blend-mode: soft-light; /* Mezcla el texto con el fondo */
+        mix-blend-mode: normal; /* Mezcla el texto con el fondo */
         backdrop-filter: blur(3px); /* Desenfoque para el fondo */
     }
 
@@ -61,7 +61,7 @@ style = '''
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, rgba(94, 74, 209, 100%) , transparent 100%);
+        background: linear-gradient(to bottom, rgba(94, 74, 209, 100%) 5% , transparent 100%);
         z-index: -1; /* Asegura que esté detrás del texto */
     }
 
@@ -234,10 +234,11 @@ script='''
 
 ## Un codigo que regrese todos los pins en un tablero desde la url usando la libreria py3pin?
 class ReferenceShuffle(Pinterest):
-    def __init__(self, password:str, username:str='', email:str='', proxies: Union[Any, None] = None, cred_root: str = 'data', user_agent:Union[Any, None] = None):
+    def __init__(self, password:str='', username:str='', email:str='', proxies: Union[Any, None] = None, cred_root: str = 'data', user_agent:Union[Any, None] = None):
         super().__init__(email=email, password=password,username=username, proxies=proxies, cred_root=cred_root, user_agent=user_agent)
         self.boards_data = {}
         self.pins_data = {}
+        self.random_boards = lambda boards, amount: {key:boards[key] for key in sample(list(boards.keys()), amount)}
         
     def get_boards_data(self, username: Union[Any, None] = None):
         if not username:
@@ -246,35 +247,67 @@ class ReferenceShuffle(Pinterest):
             data = self.boards(username) 
         self.boards_data = {b['name']:{'id':b['id'], 'url':b['url']} for b in data} 
         self.boards_data = dict(sorted(self.boards_data.items()))
+        
+        return self.boards_data
 
     def search(self, scope, query, page_size=250, reset_bookmark=False, amount:int=1000):
         pins =[]
         temp = []
-        while len(pins) < 1000 or  len(pins) < amount:
+        while len(pins) < 1000 and  len(pins) < amount*4:
             temp += super().search(scope, query, page_size, reset_bookmark)
             if not temp:
                 break
             pins += temp
         self.pin
         return pins
-    
-    def get_board_id(self, url:str):
-        from requests import get
-        from bs4 import BeautifulSoup as BS
-        ans = get(url)
-        soup = BS(ans.content, 'html.parser')
-        imgs = soup.findAll('a')
-        if not imgs:
-            return -1
-        for img in imgs:
-            if img.get('href') and img.get('href').startswith('/pin/'):
-               id  = img.get('href').split('/')[-2]
-               pin_data = self.load_pin(id)
-               
-               board_id = pin_data['board']['id']
-               self.boa
-               return board_id
                 
+    def get_keywords_pins(self, keywords, amount_pins):
+        pins = self.search('pins', keywords, 250, False, amount_pins)
+        pins = [pin for pin in pins if 'images' in pin.keys()]
+        if len(pins) > amount_pins:
+            selection = sample(pins, amount_pins)
+        else:
+            selection = pins
+        return {keywords:selection}    
+                
+    def get_random_pins(self, boards:dict, amount_boards:int=-1, amount_pins:int=12):
+        if amount_boards > 0:
+            boards = self.random_boards(boards, amount_boards)
+        
+        shake = {}
+        
+        with ThreadPoolExecutor() as executor:
+            futures = {name: executor.submit(self.get_board_pins, boards[name]['id'], amount_pins, False) for name in boards}
+            
+            # Recoger los resultados cuando los hilos terminen
+            for name, future in futures.items():
+                pins = future.result()
+                pins = [pin for pin in pins if 'images' in pin.keys()]
+                if len(pins) > amount_pins:
+                    selection = sample(pins, amount_pins)
+                else:
+                    selection = pins
+                shake[name] = selection
+        
+        return shake
+    
+    def get_board_random_feed(self, board_id, amount_pins:int = 12):
+        pins =[]
+        temp = []
+        if amount_pins < 0:
+            amount_pins = 1000
+        while len(pins) < 1000 and  len(pins) < amount_pins*4:
+            temp += self.board_feed(board_id)
+            if not temp:
+                break
+            pins += temp
+            
+        pins = [pin for pin in pins if 'images' in pin.keys()]
+        if len(pins) > amount_pins:
+            selection = sample(pins, amount_pins)
+        else:
+            selection = pins
+        return selection
         
 
     def get_all_pins(self):
@@ -345,7 +378,7 @@ if __name__== '__main__':
     #     return selection
     
     with ThreadPoolExecutor() as executor:
-        futures = {name: executor.submit(r.get_board_pins, boards[name]['id'], 10, False) for name in boards}
+        futures = {name: executor.submit(r.get_board_pins, boards[name]['id'], 3, False) for name in boards}
         
         # Recoger los resultados cuando los hilos terminen
         for name, future in futures.items():
@@ -372,7 +405,7 @@ if __name__== '__main__':
                 temp = '\t\t\t<div class="image-grid">'+f'{temp}' + f'{button_block}'+ '\t\t\t</div>'
                 if temp not in selection:
                     selection.append(temp)
-                if len(selection) >= 12:
+                if len(selection) >= 1:
                     break
 
             shake[name] = selection

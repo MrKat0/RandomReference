@@ -3,177 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        /* Fondo con degradado */
-        body {
-            background: linear-gradient(to bottom, #000000, #4b0082);
-            background-attachment: fixed;
-        }
-        
-        /* Contenedor de estrellas */
-        #stars-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        /* Contenedor principal centrado */
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full height to center vertically */
-        }
-        
-        /* Estilo para el contenedor del formulario */
-        .form-box {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            position: relative; /* Needed for button positioning */
-            z-index: 10; /* Ensures the form box is above the buttons */
-            margin-top: -10px; /* Overlap with tabs */
-        }
-        
-        /* Estilo para el contenedor de botones */
-        .button-container {
-            display: flex;
-            justify-content:start;
-        }
-        
-        /* Estilo para los botones como pestañas */
-        .button {
-            background: none;
-            color: #2a3b61;
-            border: none;
-            padding: 5px 15px;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 25px;
-            transition: background 0.3s;
-            z-index: 5; /* Ensures buttons are below the form box */
-        }
-        
-        .submit {
-            background-color: #2a3b61;
-            color: rgb(134, 231, 231);
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            text-align: center;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            box-sizing: border-box;
-        }
-        
-        .button:hover {
-            background-color: #d0d0d0; /* Slightly darker on hover */
-        }
-        
-        .button:disabled {
-            background-color: #f0f0f0; /* Disabled state */
-            color: gray; /* Gray text */
-            cursor: not-allowed;
-        }
-        
-        /* Estilo para la pestaña activa */
-        .active-button {
-            background-color: white; /* Active tab color */
-            border-color: #aaa; /* Darker border */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); 
-        }
-        
-        /* Estilo para los formularios */
-        .form {
-            margin-top: 20px;
-        }
-    </style>
+    <title>Random references</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 </head>
 <body>
     <div id="stars-container"></div>
     <div class="fixed-header">
-        Main Page Header
+        Random references
     </div>
 
     <div class="main-container">
-    <div class="form-box">
-        <div class="button-container">
-            <button class="button" id="btn-usuario" onclick="showForm('usuario')">Usuario</button>
-            <button class="button" id="btn-tablero" onclick="showForm('tablero')">Tablero</button>
-            <button class="button" id="btn-aleatorio" onclick="showForm('aleatorio')">Palabra clave</button>
-        </div>
-        <div id="forms-container">
-            <div id="usuario" class="form" style="display: block;">
-                <h2>Ingrese un</h2>
-                <h3> nombre de usuario</h3>
+        <div class="form-box" id="form-box">
+            <div class="button-container">
+                <button class="button active-button" id="btn-usuario" onclick="showForm('usuario')">Usuario</button>
+                <button class="button" id="btn-tablero" onclick="showForm('tablero')">Tablero</button>
+                <button class="button" id="btn-aleatorio" onclick="showForm('aleatorio')">Palabra clave</button>
+            </div>
+            <div id="usuario" class="form active">
+                <h2>Busqueda por usuario:</h2>
                 <form action="/username" method="post">
-                    <div style="display: grid;grid-template-columns:1fr 1fr;gap: 10px;width: 100%;">
-                    <input type="text" id="username" name="username">
-                    <input type="submit" value="Submit" class="submit">
+                    <div class="input-grid">
+                        <div style="grid-column: span 2; text-align: center;">
+                            <label for="username">Nombre de usuario:</label>
+                            <input type="text" id="username" name="username" placeholder="Nombre de usuario" style="width: 80%; margin: 0 auto;">
+                        </div>
+                        <div>
+                            <label for="amount_boards">Cantidad de tableros:</label>
+                            <input type="number" id="amount_boards" name="amount_boards" placeholder="999">
+                        </div>
+                        <div>
+                            <label for="amount_pins">Cantidad de pins:</label>
+                            <input type="number" id="amount_pins" name="amount_pins" placeholder="12">
+                        </div>
                     </div>
+                    <input type="submit" value="Submit" class="submit">
                 </form>
             </div>
-            <div id="tablero" class="form" style="display: none;">
-                <h2>Ingrese una</h2>
-                <h3>url de tablero</h3>
-                <form action="/dashboard" method="post">
-                    <div style="display: grid;grid-template-columns:1fr 1fr;gap: 10px;width: 100%;">
-                    <input type="text" id="dashboard" name="dashboard">
-                    <input type="submit" value="Submit" class="submit">
+
+            <div id="tablero" class="form">
+                <h2>Busqueda por tablero:</h2>
+                <form action="/board" method="post">
+                    <div class="input-grid">
+                        <div style="grid-column: span 2; text-align: center;">
+                            <label for="board_username">Nombre de usuario:</label>
+                            <input type="text" id="board_username" name="board_username" style="width: 80%; margin: 0 auto;" placeholder="Nombre de usuario">
+                        </div>
+                        <div>                            
+                            <label for="board_url">Url tablero:</label>
+                            <input type="text" id="board_url" name="board_url" placeholder="https://www.pinterest.com/<username>/<board>">
+                        </div>
+                        <div>
+                            <label for="amount_pins">Cantidad de pins:</label>
+                            <input type="number" id="amount_pins" name="amount_pins" placeholder="12">
+                        </div>
                     </div>
+                    <input type="submit" value="Submit" class="submit">
                 </form>
             </div>
-            <div id="aleatorio" class="form" style="display: none;">
-                <h2>Ingrese una</h2>
-                <h3>palabra clave</h3>
-                <form action="/keyword" method="post">
-                    <div style="display: grid;grid-template-columns:1fr 1fr;gap: 10px;width: 100%;">
-                    <input type="text" id="keyword" name="keyword">
-                    <input type="submit" value="Submit" class="submit">
-                    </div>
-                </form>
+            
+
+                <div id="aleatorio" class="form">
+                    <h2>Busqueda por palabras clave:</h2>
+                    <form action="/keyword" method="post">
+                        <div class="input-grid">
+                            <div>
+                                <label for="keyword">Palabras clave:</label>
+                                <input type="text" id="keyword" name="keyword" placeholder="Ingrese palabra clave">
+                            </div>
+                            <div>
+                                <label for="amount_pins">Cantidad de pins:</label>
+                                <input type="number" id="amount_pins" name="amount_pins" placeholder="12">
+                            </div>
+                        </div>
+                        <input type="submit" value="Submit" class="submit">
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
         function showForm(formName) {
             const forms = document.querySelectorAll('.form');
             const buttons = document.querySelectorAll('.button');
-
+    
+            // Hide all forms with a fade-out effect
             forms.forEach(form => {
-                form.style.display = 'none'; // Hide all forms
+                form.style.opacity = '0'; // Start fade-out
             });
-            document.getElementById(formName).style.display = 'block'; // Show selected form
-
+    
             // Disable buttons for the active form
             buttons.forEach(button => {
                 button.disabled = false; // Enable all buttons
                 button.classList.remove('active-button'); // Remove active class
             });
-            document.getElementById(`btn-${formName}`).disabled = true; // Disable the active button
+    
+            // Set a timeout to remove the form after fade-out
+            setTimeout(() => {
+                forms.forEach(form => {
+                    form.classList.remove('active'); // Hide all forms
+                    form.style.display = 'none'; // Hide the forms
+                });
+    
+                const selectedForm = document.getElementById(formName);
+                selectedForm.style.display = 'block'; // Show selected form
+    
+                // Set a timeout to fade in the selected form
+                setTimeout(() => {
+                    selectedForm.style.opacity = '1'; // Fade-in effect
+                    selectedForm.classList.add('active'); // Show selected form
+                    // Update the form-box height to fit the new form
+                    const formBox = document.querySelector('.form-box');
+                    formBox.style.height = `${selectedForm.offsetHeight + 60}px`; // Add padding for content
+                }, 100); // Delay for fade-in
+    
+            }, 350); // Delay for fade-out before showing the next form
+    
+            // Disable the active button
+            document.getElementById(`btn-${formName}`).disabled = true; 
             document.getElementById(`btn-${formName}`).classList.add('active-button'); // Add active class
         }
-
+    
         function createStar() {
             const star = document.createElement('div');
             star.style.position = 'absolute';
@@ -186,7 +136,7 @@
             star.dataset.speed = Math.random() * 0.10 + 0.01; // Store speed as a dataset attribute
             return star;
         }
-
+    
         function initStars() {
             const container = document.getElementById('stars-container');
             for (let i = 0; i < 100; i++) {
@@ -194,26 +144,29 @@
             }
             moveStars(); // Initial position update
         }
-
+    
         function moveStars() {
             const stars = document.querySelectorAll('#stars-container div');
             const scrollY = window.scrollY;
-            
+    
             stars.forEach(star => {
                 const speed = parseFloat(star.dataset.speed);
                 star.style.transform = `translateY(${scrollY * speed}px)`;
             });
-            
+    
             requestAnimationFrame(moveStars); // Request next frame for smooth animation
         }
-
-        window.addEventListener('load', initStars);
+    
+        window.addEventListener('load', () => {
+            initStars();
+            showForm('usuario'); // Initialize with the default form
+        });
+    
         window.addEventListener('scroll', () => {
             requestAnimationFrame(moveStars); // Trigger the movement only on scroll
         });
-
-        // Initialize with the default form
-        showForm('usuario');
     </script>
+    
+    
 </body>
 </html>
